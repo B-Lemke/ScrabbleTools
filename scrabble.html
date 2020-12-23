@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrabble</title>
+</head>
+
+<body>
+    <div class="display">
+        <h2>List of words</h2>
+        <p>Seperate words by comma</p>
+        <textarea id="wordInput" rows=10 cols=100></textarea><br>
+        <button onclick="CalculateWords()">Calculate</button>
+        <h2>Letter Counts</h2>
+        <ul id="letterCounts"></ul>
+        <h2>Score Without Bonuses</h2>
+        <p id="score"></p>
+        <h2>Number of Standard Bags Needed</h2>
+        <p id="numberOfBags"></p>
+    </div>
+    <script>
+        // The standard tiles in a scrabble set
+        let defaultTiles = {
+            "A": {
+                "Count": 9,
+                "Points": 1
+            },
+            "B": {
+                "Count": 2,
+                "Points": 3
+            },
+            "C": {
+                "Count": 2,
+                "Points": 3
+            },
+            "D": {
+                "Count": 4,
+                "Points": 2
+            },
+            "E": {
+                "Count": 12,
+                "Points": 1
+            },
+            "F": {
+                "Count": 2,
+                "Points": 4
+            },
+            "G": {
+                "Count": 3,
+                "Points": 2
+            },
+            "H": {
+                "Count": 2,
+                "Points": 4
+            },
+            "I": {
+                "Count": 9,
+                "Points": 1
+            },
+            "J": {
+                "Count": 1,
+                "Points": 8
+            },
+            "K": {
+                "Count": 1,
+                "Points": 5
+            },
+            "L": {
+                "Count": 4,
+                "Points": 1
+            },
+            "M": {
+                "Count": 2,
+                "Points": 3
+            },
+            "N": {
+                "Count": 6,
+                "Points": 1
+            },
+            "O": {
+                "Count": 8,
+                "Points": 1
+            },
+            "P": {
+                "Count": 2,
+                "Points": 3
+            },
+            "Q": {
+                "Count": 1,
+                "Points": 10
+            },
+            "R": {
+                "Count": 6,
+                "Points": 1
+            },
+            "S": {
+                "Count": 4,
+                "Points": 1
+            },
+            "T": {
+                "Count": 6,
+                "Points": 1
+            },
+            "U": {
+                "Count": 4,
+                "Points": 1
+            },
+            "V": {
+                "Count": 2,
+                "Points": 4
+            },
+            "W": {
+                "Count": 2,
+                "Points": 4
+            },
+            "X": {
+                "Count": 1,
+                "Points": 8
+            },
+            "Y": {
+                "Count": 2,
+                "Points": 4
+            },
+            "Z": {
+                "Count": 1,
+                "Points": 10
+            },
+            "BLANK": {
+                "Count": 2,
+                "Points": 0
+            }
+        }
+
+        // Input words to run functions on
+        let testWords = ["Broderick", "Lemke", "Nickolas", "Sternitzky", "Tobby", "Blep", "Pupper", "Garbo"];
+
+        function CalculateWords(){
+            let wordInput = document.getElementById("wordInput");
+            let words = [];
+            if(wordInput.value == ""){
+                words = [...testWords];
+                wordInput.value = testWords.join(", ");
+            } else {
+                words = wordInput.value.split(",");
+            }
+
+            let letterCount = CountLetters(words);
+            let bags = CheckBagCount(letterCount);
+            let points = CountPoints(letterCount);
+
+            UpdateDisplay(points, bags, letterCount);
+        };
+
+        function CountLetters(words) {
+            // Counts of each letter in the input words
+            let wordLetterCounts = {};
+            words.forEach(word => {
+                [...word].forEach(letter => {
+                    // If not a letter, skip it
+                    if (!letter.match(/[a-z]/i)) {
+                        return;
+                    }
+
+                    let letterUpper = letter.toUpperCase();
+                    if (wordLetterCounts[letterUpper] === undefined) {
+                        wordLetterCounts[letterUpper] = 1;
+                    } else {
+                        wordLetterCounts[letterUpper]++;
+                    }
+                });
+            });
+            return wordLetterCounts;
+        }
+
+        function CheckBagCount(wordLetterCounts) {
+            // Check how many bags of tiles you will need for the words
+            let bagCount = 0;
+            for (const [key, value] of Object.entries(wordLetterCounts)) {
+                if (defaultTiles[key].Count * bagCount < value) {
+                    bagCount = Math.ceil(value / defaultTiles[key].Count);
+                }
+            }
+            return bagCount;
+        }
+
+        function CountPoints(wordLetterCounts) {
+            // Count Points
+            let score = 0;
+            for (const [key, value] of Object.entries(wordLetterCounts)) {
+                score += defaultTiles[key].Points * value;
+            }
+            return score;
+        }
+
+        function UpdateDisplay(score, bagCount, wordLetterCounts) {
+            // Display info
+            document.getElementById("score").innerHTML = score;
+            document.getElementById("numberOfBags").innerHTML = bagCount;
+
+            const letterCountUl = document.getElementById("letterCounts");
+            // clear out previous count
+            letterCountUl.innerHTML = "";
+            for (const [key, value] of Object.entries(wordLetterCounts).sort()) {
+                const li = document.createElement("li");
+                li.innerText = `${key}: ${value}`;
+                letterCountUl.appendChild(li);
+            }
+        }
+
+
+
+
+    </script>
+</body>
+
+</html>
