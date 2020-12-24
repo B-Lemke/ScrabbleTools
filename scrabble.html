@@ -5,6 +5,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrabble</title>
+    <style>
+        #board {
+            display: grid;
+            grid-template-columns: repeat(15, minmax(0, 1fr));
+            grid-gap: 5px;
+            width: 90%;
+            margin: auto;
+
+        }
+
+        #board>div {
+            background-color: #C19A57;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #board>div:empty {
+            background: #ccc;
+        }
+
+        #board div div {
+            font-size: 4vw;
+            height: auto
+        }
+
+        #board>div::before {
+            content: "";
+            padding-bottom: 100%;
+            display: inline-block;
+            vertical-align: top;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,6 +53,25 @@
         <p id="score"></p>
         <h2>Number of Standard Bags Needed</h2>
         <p id="numberOfBags"></p>
+        <div id="board">
+            <div>
+                <div>T</div>
+            </div>
+            <div></div>
+            <div></div>
+            <div>Test</div>
+            <div>Test</div>
+            <div>Test</div>
+            <div>Test</div>
+            <div>Test</div>
+            <div>Test</div>
+            <div>Test</div>
+            <div></div>
+            <div></div>
+            <div></div>
+
+
+        </div>
     </div>
     <script>
         // The standard tiles in a scrabble set
@@ -135,11 +188,43 @@
 
         // Input words to run functions on
         let testWords = ["Broderick", "Lemke", "Nickolas", "Sternitzky", "Tobby", "Blep", "Pupper", "Garbo"];
+        let rows = 10;
+        let cols = 10;
+        let testBoard = [
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
 
-        function CalculateWords(){
+            ["", "", "", "b", "", "", "", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "r", "", "", "", "", "", "", "", "", "", "", ""],
+
+            ["", "", "t", "o", "b", "b", "y", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "d", "", "", "o", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "e", "", "", "u", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "r", "o", "o", "t", "e", "d", "", "", "", "", "", ""],
+
+            ["", "", "", "i", "", "", "u", "", "a", "", "", "", "", "", ""],
+
+            ["", "", "", "c", "l", "u", "b", "", "d", "", "", "", "", "", ""],
+
+            ["", "", "", "k", "", "", "e", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+
+        ]
+
+        function CalculateWords() {
             let wordInput = document.getElementById("wordInput");
             let words = [];
-            if(wordInput.value == ""){
+            if (wordInput.value == "") {
                 words = [...testWords];
                 wordInput.value = testWords.join(", ");
             } else {
@@ -151,6 +236,7 @@
             let points = CountPoints(letterCount);
 
             UpdateDisplay(points, bags, letterCount);
+            DrawBoard();
         };
 
         function CountLetters(words) {
@@ -210,7 +296,29 @@
         }
 
 
+        function DrawBoard() {
+            let board = document.getElementById("board");
+            console.log(`grid-template-columns: repeat(${rows}, minmax(0, 1fr))`, );
 
+            board.style.gridTemplateColumns = `repeat(${rows}, minmax(0,1fr))`;
+            board.innerHTML = "";
+
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+
+                    let newSquare = document.createElement("div");
+
+
+                    if (testBoard[row][col] != "") {
+                        let contents = document.createElement("div");
+                        contents.innerHTML = testBoard[row][col];
+                        newSquare.appendChild(contents);
+                    }
+
+                    board.appendChild(newSquare);
+                }
+            }
+        }
 
     </script>
 </body>
