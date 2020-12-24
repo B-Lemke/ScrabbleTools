@@ -188,42 +188,14 @@
 
         // Input words to run functions on
         let testWords = ["Broderick", "Lemke", "Nickolas", "Sternitzky", "Tobby", "Blep", "Pupper", "Garbo"];
-        let rows = 10;
-        let cols = 10;
-        let testBoard = [
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "b", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "r", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "t", "o", "b", "b", "y", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "d", "", "", "o", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "e", "", "", "u", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "r", "o", "o", "t", "e", "d", "", "", "", "", "", ""],
-
-            ["", "", "", "i", "", "", "u", "", "a", "", "", "", "", "", ""],
-
-            ["", "", "", "c", "l", "u", "b", "", "d", "", "", "", "", "", ""],
-
-            ["", "", "", "k", "", "", "e", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-
-            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-
-        ]
+        let rows = 1;
+        let cols = 1;
+        let board = [];
+        let words = [];
 
         function CalculateWords() {
             let wordInput = document.getElementById("wordInput");
-            let words = [];
+            words = [];
             if (wordInput.value == "") {
                 words = [...testWords];
                 wordInput.value = testWords.join(", ");
@@ -257,12 +229,14 @@
                     }
                 });
             });
+
             return wordLetterCounts;
         }
 
         function CheckBagCount(wordLetterCounts) {
             // Check how many bags of tiles you will need for the words
             let bagCount = 0;
+            console.log(wordLetterCounts);
             for (const [key, value] of Object.entries(wordLetterCounts)) {
                 if (defaultTiles[key].Count * bagCount < value) {
                     bagCount = Math.ceil(value / defaultTiles[key].Count);
@@ -295,13 +269,80 @@
             }
         }
 
+        function FillBoard() {
+            // Fill board with empty spaces
+            for(let i = 0; i < rows; i++){
+                board.push([]);
+                for(let j = 0; j < cols; j++){
+                    board[i].push("");
+                }
+            }
+
+            // Sort by length
+            words = [...words].sort(function (a,b)  { return b.length - a.length;});
+
+            // Loop through words
+            for(let i = 0; i < words.length; i++){
+                let word = words[i];
+
+                // Make sure the board will fit the longest word
+                while(words[i].length > rows){
+                    ExpandBoard();
+                }
+
+                // Place first word in the center square
+                if(i == 0){
+                    console.log(word);
+                    let center = {x: Math.ceil(rows/2), y: Math.ceil(cols/2)};
+                    
+                    for( let j = 0; j < word.length; j++){
+                        let col = center.y - Math.ceil(word.length / 2) + j;
+                        console.log(col);
+                        board[center.x][col] = word[j];
+                    }
+                    Math.ceil(word.length / 2);
+                }
+            }
+
+
+
+
+            console.log(words);
+        }
+
+        function ExpandBoard(){
+            // Expand the board around the center
+            console.log("EXPANDING");
+
+            // Make new row
+            let newRow = [];
+            for(let i = 0; i < cols; i++){
+                newRow.push("");
+            }
+
+            // Add to the front of the array;
+            board.unshift(newRow);
+            board.push([...newRow]);
+
+            // Expand each row with 2 cols
+            for(let i = 0; i < board.length; i++){
+                board[i].unshift("");
+                board[i].push("");
+            }
+
+            // up row count
+            rows+=2;
+            cols+=2;
+        }
 
         function DrawBoard() {
-            let board = document.getElementById("board");
+            FillBoard();
+
+            let boardEl = document.getElementById("board");
             console.log(`grid-template-columns: repeat(${rows}, minmax(0, 1fr))`, );
 
-            board.style.gridTemplateColumns = `repeat(${rows}, minmax(0,1fr))`;
-            board.innerHTML = "";
+            boardEl.style.gridTemplateColumns = `repeat(${rows}, minmax(0,1fr))`;
+            boardEl.innerHTML = "";
 
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols; col++) {
@@ -309,13 +350,13 @@
                     let newSquare = document.createElement("div");
 
 
-                    if (testBoard[row][col] != "") {
+                    if (board[row] != undefined && board[row][col] != undefined && board[row][col] != "") {
                         let contents = document.createElement("div");
-                        contents.innerHTML = testBoard[row][col];
+                        contents.innerHTML = board[row][col];
                         newSquare.appendChild(contents);
                     }
 
-                    board.appendChild(newSquare);
+                    boardEl.appendChild(newSquare);
                 }
             }
         }
